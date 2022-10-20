@@ -3,35 +3,56 @@ const createError = require("http-errors");
 
 const User = require("../../models/userModel");
 
+const customCheckForDisplayName = (value, {req}) => {
+    let lastName = req.body?.lastName;
+    lastName = lastName ? lastName : "";
+    value = value ? value : "";
+    let displayName = value?.trim() + " " + lastName.trim();
+    displayName = displayName.trim();
+
+    if (
+        displayName === "" ||
+        displayName === undefined ||
+        displayName === null ||
+        displayName === " "
+    ) {
+        throw new Error("First Name or Last Name should be filled.");
+    } else return value ? value : " ";
+};
+
 // signUp validation
 const contactValidators = [
-    check("firstName").custom((value, {req}) => {
-        let lastName = req.body?.lastName;
-        lastName = lastName ? lastName : "";
-        value = value ? value : "";
-        let displayName = value?.trim() + " " + lastName.trim();
-        displayName = displayName.trim();
-
-        if (
-            displayName === "" ||
-            displayName === undefined ||
-            displayName === null ||
-            displayName === " "
-        ) {
-            throw new Error("First Name or Last Name should be filled.");
-        } else return value ? value : " ";
-    }),
+    check("firstName").custom(customCheckForDisplayName),
     check("email")
+        .optional()
         .trim()
         .isEmail()
-        .withMessage("Invalid email address!")
-        .trim(),
+        .withMessage("Invalid email address!"),
+    check("phone").trim().isMobilePhone().withMessage("Invalid phone number!"),
+    check("address")
+        .optional()
+        .isString()
+        .withMessage("Address must be a string."),
+];
+const contactUpdateValidators = [
+    check("email")
+        .optional()
+        .trim()
+        .isEmail()
+        .withMessage("Invalid email address!"),
     check("phone")
+        .optional()
         .trim()
         .isMobilePhone()
-        .withMessage("Invalid phone number!")
-        .trim(),
-    check("address").isString().withMessage("Address must be a string.").trim(),
+        .withMessage("Invalid phone number!"),
+    check("address")
+        .optional()
+        .isString()
+        .withMessage("Address must be a string."),
+    check("imgUrl")
+        .optional()
+        .isString()
+        .withMessage("imgUrl must be a string."),
 ];
 
 const contactValidationHandler = function (req, res, next) {
@@ -50,4 +71,5 @@ const contactValidationHandler = function (req, res, next) {
 module.exports = {
     contactValidators,
     contactValidationHandler,
+    contactUpdateValidators,
 };

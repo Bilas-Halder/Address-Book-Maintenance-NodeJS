@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const createError = require("http-errors");
 
-const contactModel = new mongoose.Schema(
+const contactSchema = new mongoose.Schema(
     {
         firstName: {
             type: String,
@@ -27,11 +27,12 @@ const contactModel = new mongoose.Schema(
     {timestamps: true}
 );
 
-contactModel.pre("save", function (next) {
+contactSchema.pre("save", function (next) {
+    this.firstName = this.firstName ? this.firstName : "";
+    this.lastName = this.lastName ? this.lastName : "";
     this.displayName = this.firstName + " " + this.lastName;
     this.displayName = this.displayName.trim();
-
     next();
 });
 
-module.exports = mongoose.model("Contact", contactModel);
+module.exports = mongoose.model("Contact", contactSchema);

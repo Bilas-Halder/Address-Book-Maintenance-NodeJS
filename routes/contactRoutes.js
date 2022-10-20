@@ -8,11 +8,15 @@ const Contact = require("../models/contactModel");
 const {
     contactValidators,
     contactValidationHandler,
+    contactUpdateValidators,
 } = require("../middlewares/contacts/contactValidator");
 
 const {
     singlePostController,
     getQueryController,
+    deleteContactController,
+    getSingleContactController,
+    UpdateContactController,
 } = require("../controllers/contacts");
 const authGuard = require("../middlewares/authGuard");
 
@@ -40,6 +44,9 @@ const authGuard = require("../middlewares/authGuard");
 
 router.get("/", authGuard, getQueryController);
 
+// Get single contact
+router.get("/:id", authGuard, getSingleContactController);
+
 // Post
 router.post(
     "/",
@@ -47,6 +54,18 @@ router.post(
     contactValidators,
     contactValidationHandler,
     singlePostController
+);
+
+// Delete
+router.delete("/:id", authGuard, deleteContactController);
+
+// Update
+router.patch(
+    "/:id",
+    authGuard,
+    contactUpdateValidators,
+    contactValidationHandler,
+    UpdateContactController
 );
 
 module.exports = router;
