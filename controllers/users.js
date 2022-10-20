@@ -1,8 +1,8 @@
 const express = require("express");
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
-const User = require("../models/userSchema");
-// const VerificationToken = require("../models/verificationTokenSchema");
+const User = require("../models/userModel");
+// const VerificationToken = require("../models/verificationTokenModel");
 const jwt = require("jsonwebtoken");
 const path = require("path");
 
@@ -99,7 +99,7 @@ const loginController = async (req, res) => {
             { ...payload },
             process.env.TOKEN_SECRET,
             {
-              expiresIn: "60s",
+              expiresIn: "1d",
             }
           );
 

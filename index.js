@@ -3,7 +3,8 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 const path = require("path");
 
-const users = require("./routes/userRoutes.js");
+const userRoutes = require("./routes/userRoutes.js");
+const contactRoutes = require("./routes/contactRoutes.js");
 
 const { notFoundHandler, errorHandler } = require("./middlewares/errorHandler");
 
@@ -26,7 +27,8 @@ app.use(express.json());
 
 // app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/api/v1/users", users);
+app.use("/api/v1/users", userRoutes);
+app.use("/api/v1/contacts", contactRoutes);
 
 app.use(
   "/avatars",
