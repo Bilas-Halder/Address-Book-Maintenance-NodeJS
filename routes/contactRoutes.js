@@ -12,12 +12,19 @@ const {
     getQueryController,
     deleteContactController,
     getSingleContactController,
-    UpdateContactController,
+    updateContactController,
+    exportContactsController,
+    importContactsController,
 } = require("../controllers/contacts");
+
+const {uploadCSVfile} = require("../services/utils/fileUpload");
 
 const authGuard = require("../middlewares/authGuard");
 
 router.get("/", authGuard, getQueryController);
+
+// Export all contacts
+router.get("/export", exportContactsController);
 
 // Get single contact
 router.get("/:id", authGuard, getSingleContactController);
@@ -31,6 +38,8 @@ router.post(
     singlePostController
 );
 
+router.post("/import", authGuard, uploadCSVfile, importContactsController);
+
 // Delete
 router.delete("/:id", authGuard, deleteContactController);
 
@@ -40,7 +49,7 @@ router.patch(
     authGuard,
     contactUpdateValidators,
     contactValidationHandler,
-    UpdateContactController
+    updateContactController
 );
 
 module.exports = router;

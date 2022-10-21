@@ -1,5 +1,11 @@
 const express = require("express");
 const Contact = require("../models/contactModel");
+const fs = require("fs");
+
+const {
+    convertJson2Csv,
+    convertCsv2Json,
+} = require("../services/utils/convert-2-JSON-or-CSV");
 
 const advanceFiltering = (req) => {
     const requestedQuery = req.query;
@@ -183,7 +189,7 @@ const deleteContactController = async (req, res) => {
     }
 };
 
-const UpdateContactController = async (req, res) => {
+const updateContactController = async (req, res) => {
     const id = req.params.id;
     const {firstName, lastName, email, imgUrl, phone, address} = req.body;
 
@@ -248,10 +254,70 @@ const UpdateContactController = async (req, res) => {
     }
 };
 
+const exportContactsController = async (req, res) => {
+    try {
+        const contacts = await Contact.find({
+            user: req.userID,
+        }).select("-_id -__v -createdAt -updatedAt -frequency -user ");
+        const fields = [
+            "firstName",
+            "lastName",
+            "displayName",
+            "email",
+            "phone",
+            "address",
+            "imgUrl",
+        ];
+        const path = convertJson2Csv({
+            data: contacts,
+            fields: fields,
+            path: `./My Contacts.csv`,
+        });
+
+        return res.download(path, () => {
+            fs.unlinkSync(path); // will delete the csv file after download
+        });
+    } catch {
+        res.status(500).json({
+            status: 500,
+            msg: "Something is wrong. Please try again!",
+        });
+    }
+};
+
+const importContactsController = async (req, res) => {
+    try {
+        const path = req.file.path;
+        const jsonData = await convertCsv2Json(path);
+
+        const data = jsonData.map((contact) => {
+            contact.user = req.userID;
+            return contact;
+        });
+
+        const result = await Contact.insertMany(data);
+        res.status(200).send({
+            status: 200,
+            inserted: 0,
+            msg: "Contact list added!",
+            result,
+        });
+
+        fs.unlinkSync(path); // will delete the csv file after insertion
+    } catch {
+        res.status(500).json({
+            status: 500,
+            msg: "Something is wrong. Please try again!",
+        });
+    }
+};
+
 module.exports = {
     singlePostController,
     getQueryController,
     deleteContactController,
     getSingleContactController,
-    UpdateContactController,
+    updateContactController,
+    exportContactsController,
+    importContactsController,
 };

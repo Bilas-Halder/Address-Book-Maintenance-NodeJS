@@ -68,13 +68,13 @@ A rest api to maintain your address book or contact information.
 
 #### Current Version - 1
 
-```http
+```
   https://addressbookmaintenance.onrender.com/api/v1
 ```
 
 #### Sign UP
 
-```http
+```
   POST live-link/api/v1/users/signup
 ```
 
@@ -92,7 +92,7 @@ User Info.
 
 #### Login
 
-```http
+```
   POST live-link/api/v1/users/login
 ```
 
@@ -118,9 +118,9 @@ from now on every other API will need a header named Authentication
 | :-------- | :------- | :-------------------------------- |
 | `Authentication` | `string` | **Required**. Bearer your-JSON-Web-Token-from-login|
 
-#### Get Current user details
+#### Fetch Current user details
 
-```http
+```
   GET live-link/api/v1/users
 ```
 
@@ -136,7 +136,7 @@ Current User Info.
 
 #### Update Current User Account
 
-```http
+```
   PUT live-link/api/v1/users/${id}
 ```
 
@@ -146,7 +146,7 @@ Current User Info.
 
 #### Delete Current User Account
 
-```http
+```
   DELETE live-link/api/v1/users
 ```
 
@@ -157,9 +157,9 @@ Current User Info.
 
 ### Contact APIs
 
-#### Get a single contact
+#### Fetch a single contact
 
-```http
+```
   GET live-link/api/v1/contacts/${id}
 ```
 
@@ -173,9 +173,9 @@ _JSON Response_
 Contact details.
 ```
 
-#### Get a contact lists
+#### Fetch contact lists with user control
 
-```http
+```
   GET live-link/api/v1/contacts
 ```
 
@@ -202,7 +202,7 @@ Matched Contacts List.
 
 **_Example_**
 
-```http
+```
 https://addressbookmaintenance.onrender.com/api/v1/contacts?page=2&limit=4&fields=email,phone,displayName,-id&sort=displayName
 ```
 
@@ -210,9 +210,21 @@ https://addressbookmaintenance.onrender.com/api/v1/contacts?page=2&limit=4&field
 The above request will return a JSON response where we will get 5th to 8th matched contacts because the requested page is 2 and the limit is 4, and those will be sorted by displayName in ascending order, and there will be only Email, Phone and Display Name on the contacts details.
 ```
 
+#### Export contacts as csv file
+
+```
+  GET live-link/api/v1/contacts/export
+```
+
+_Response_
+
+```
+A .csv file will be downloaded.
+```
+
 #### Add a contacts information
 
-```http
+```
   POST live-link/api/v1/contacts
 ```
 
@@ -224,9 +236,19 @@ The above request will return a JSON response where we will get 5th to 8th match
 | `phone`     | `string` | **Required**.                                             |
 | `address`   | `string` | **_Optional_**.                                           |
 
+#### Add bulk contacts information or import contact list
+
+```
+  POST live-link/api/v1/contacts/import
+```
+
+| Parameter | Type   | Description                                                                                     |
+| :-------- | :----- | :---------------------------------------------------------------------------------------------- |
+| `csvFile` | `file` | **Required**. A .csv file with following fields. [ firstName, lastName, email, phone, address ] |
+
 #### Update a contact
 
-```http
+```
   UPDATE live-link/api/v1/contacts/${id}
 ```
 
@@ -247,7 +269,7 @@ Updated Contact details.
 
 #### Delete a contact
 
-```http
+```
   DELETE live-link/api/v1/contacts/${id}
 ```
 
