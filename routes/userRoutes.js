@@ -16,35 +16,17 @@ const {
     signUpController,
     deleteAccountController,
     loginController,
+    updateAccountController,
 } = require("../controllers/users");
 const authGuard = require("../middlewares/authGuard");
 
-router.get("/", authGuard, (req, res) => {
-    User.find({}, (err, users) => {
-        if (err) {
-            res.status(500).send(err);
-        } else {
-            res.status(200).send(users);
-        }
-    });
-});
-
-router.get("/emails", async (req, res) => {
+router.get("/", authGuard, async (req, res) => {
+    const userID = req.userID;
+    console.log(userID);
     try {
-        const users = await User.find({}).select({
-            email: 1, // will return only email & _id
-        });
-        res.status(200).send(users);
-    } catch (err) {
-        res.status(500).send(err);
-    }
-});
-
-router.get("/:id", async (req, res) => {
-    const id = req.params.id;
-    try {
-        const user = await User.findById(id);
-        res.status(200).send(user);
+        const user = await User.findById(userID);
+        const {password, ...rest} = user._doc;
+        res.status(200).send(rest);
     } catch (err) {
         res.status(500).send(err);
     }
@@ -61,25 +43,7 @@ router.post(
 router.post("/login", loginValidators, loginValidationHandler, loginController);
 
 // Update
-router.put("/:id", (req, res) => {
-    const id = req.params.id;
-    User.findByIdAndUpdate(
-        {_id: id},
-        {$set: req.body},
-        {
-            useFindAndModify: false,
-            new: true, // to return the updated document
-        },
-
-        (err, user) => {
-            if (err) {
-                res.status(500).send(err);
-            } else {
-                res.status(200).send(user);
-            }
-        }
-    );
-});
+router.put("/:id", authGuard, updateAccountController);
 
 // Delete
 router.delete(
