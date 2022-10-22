@@ -9,7 +9,7 @@ const mb = 1024 * 1024;
 
 const storage = multer.diskStorage({
     destination: (req, file, callback) => {
-        callback(null, uploadCsvPath);
+        callback(null, uploadCsvPath); // upload path required
     },
     filename: (req, file, callback) => {
         const extension = path.extname(file.originalname); // will get .csv

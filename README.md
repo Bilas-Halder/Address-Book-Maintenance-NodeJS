@@ -56,6 +56,13 @@ A rest api to maintain your address book or contact information.
     - Then enjoy the lightening fast rest api.
 ```
 
+**_Preferred Testing tool_**
+
+```
+    - We preferred to test this project in Postman(Software) or Thunder Clint(VScode Extension).
+    - Cause there will be need to change headers and send post request and others, which is easy to maintain in mentioned tools.
+```
+
 ## Tech Stack
 
 **Server:** NodeJS, ExpressJS

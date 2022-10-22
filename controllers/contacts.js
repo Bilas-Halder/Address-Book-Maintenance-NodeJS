@@ -18,16 +18,16 @@ const advanceFiltering = (req) => {
     const query = {};
     if (filters) {
         let filterStr = JSON.stringify(filters);
-        // operators -> gt gte lt lte eq in ne nin and not nor or exists
-        // in use->
-        //      price is greater then 50 price[gt]=50
-        //      price is not greater then 50 price[nt][gt]=50
 
         filterStr = filterStr.replace(
             /\b(gt|gte|lt|lte|eq|in|ne|nin|and|not|nor|or|exists)\b/g,
             (match) => `$${match}`
             // if any match than add $ sign before the match
         );
+        /*  this is for operators to be handled
+            Like->
+                price is greater then 50 price[gt]=50
+                price is not greater then 50 price[nt][gt]=50 */
 
         query.filters = JSON.parse(filterStr); //New filters Object
 
@@ -35,7 +35,7 @@ const advanceFiltering = (req) => {
         // checking for the user specific contacts list
     }
     if (sort) {
-        const sortBy = sort.split(",").join(" ");
+        const sortBy = sort.split(",").join(" "); // making coma separated string space separated
         query.sort = sortBy;
     }
     if (fields) {
@@ -43,6 +43,8 @@ const advanceFiltering = (req) => {
         query.fields = selectedFields;
     }
     if (page) {
+        // here skip = (page-1) * limit
+
         const pages = parseInt(page);
         if (pages !== 0 && pages !== NaN && pages !== null) {
             const skip = (pages - 1) * parseInt(limit);
@@ -96,10 +98,10 @@ const getQueryController = async (req, res) => {
         }
 
         const contacts = await Contact.find(query.filters)
-            .select(query.fields)
-            .sort(query.sort)
-            .skip(query.skip)
-            .limit(query.limit);
+            .select(query.fields) // selecting mentioned fields only
+            .sort(query.sort) // sorting according the sort string
+            .skip(query.skip) // skipping the previous pages
+            .limit(query.limit); // limit of the result array
 
         res.status(200).send({
             // query,
@@ -126,6 +128,8 @@ const getSingleContactController = async (req, res) => {
                 status: 200,
                 data: contact,
             });
+            // updating frequency after every single hit on a contact
+            // this helps to get sorted by the frequently used contacts
             await Contact.findOneAndUpdate(
                 {_id: id},
                 {
@@ -298,7 +302,7 @@ const importContactsController = async (req, res) => {
         const result = await Contact.insertMany(data);
         res.status(200).send({
             status: 200,
-            inserted: 0,
+            inserted: result.length,
             msg: "Contact list added!",
             result,
         });
